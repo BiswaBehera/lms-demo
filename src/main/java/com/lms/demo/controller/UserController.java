@@ -44,6 +44,25 @@ public class UserController {
         return userService.saveBorrowBook(bookBorrowDto);
     }
 
+    @PostMapping("/user/return")
+    public ReturnBookResponse returnBook(@RequestBody ReturnBookDto returnBookDto) throws IllegalPropertyValueException, EntityNotFoundException, InvalidEntityException {
+
+        //null issue id check
+        if(returnBookDto.getIssueId() == null) {
+            throw new IllegalPropertyValueException(ErrorResponseMessages.nullIssueIdForReturn);
+        }
+        //null library id check
+        if(returnBookDto.getLibraryId() == null) {
+            throw new IllegalPropertyValueException(ErrorResponseMessages.nullLibraryIdForReturn);
+        }
+        //null barcode check
+        if(returnBookDto.getBarcode() == null) {
+            throw new IllegalPropertyValueException(ErrorResponseMessages.nullBarcodeForReturn);
+        }
+
+        return userService.returnBook(returnBookDto);
+    }
+
     @PostMapping("/user/get_library_card")
     public LibraryCardResponse fetchLibraryCard(@RequestBody GetLibraryCardDto getLibraryCardDto) throws IllegalPropertyValueException, EntityNotFoundException {
         //null check for library id

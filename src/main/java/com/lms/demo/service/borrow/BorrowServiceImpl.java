@@ -28,31 +28,42 @@ public class BorrowServiceImpl implements BorrowService{
     }
 
     @Override
+    public BorrowDetails fetchByIssueId(Long id) throws EntityNotFoundException {
+        Optional<BorrowDetails> borrowDetails = borrowDetailsRepository.findById(id);
+        if(borrowDetails.isEmpty()) {
+            throw new EntityNotFoundException(ErrorResponseMessages.borrowDetailsNotFound);
+        }
+
+        return borrowDetails.get();
+    }
+
+    @Override
     public BorrowDetails updateFineWithoutPersist(BorrowDetails borrowDetails) {
         Date dueDate = borrowDetails.getDueDate();
         if(System.currentTimeMillis() > dueDate.getTime()) {
             long day_diff = ((System.currentTimeMillis() - dueDate.getTime()) / (1000*60*60*24)) % 365;
             borrowDetails.setFine((int) day_diff * 10);
         }
-        return null;
+        return borrowDetails;
     }
 
     @Override
     public List<BorrowDetails> fetchActiveBorrowsByUserId(Long id) throws EntityNotFoundException {
 
-        Optional<User> user = userService.getUserById(id);
-
-        if(user.isEmpty()) {
-            throw new EntityNotFoundException(ErrorResponseMessages.userNotFound);
-        }
+        User user = userService.getUserById(id);
 
         List<BorrowDetails> activeBorrowDetailsList =
-                borrowDetailsRepository.findByUserAndReturnDate(user.get(), null);
+                borrowDetailsRepository.findByUserAndReturnDate(user, null);
 
         for(BorrowDetails b: activeBorrowDetailsList) {
             updateFineWithoutPersist(b);
         }
 
         return activeBorrowDetailsList;
+    }
+
+    @Override
+    public int updateReturnDate(Long issueId) {
+        return borrowDetailsRepository.updateReturnDateByIssueId(issueId, new Date(System.currentTimeMillis()));
     }
 }

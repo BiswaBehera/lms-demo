@@ -46,4 +46,11 @@ public class RestEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
     }
+
+    @ExceptionHandler(InvalidEntityException.class)
+    public ResponseEntity<ErrorMessage> invalidEntityExceptionHandler(InvalidEntityException e, WebRequest req) {
+        ErrorMessage message = new ErrorMessage(HttpStatus.CONFLICT, e.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+    }
 }

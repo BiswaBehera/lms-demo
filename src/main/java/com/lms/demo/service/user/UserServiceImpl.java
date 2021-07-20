@@ -13,9 +13,8 @@ import com.lms.demo.service.book.BookService;
 import com.lms.demo.service.borrow.BorrowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,17 +59,19 @@ public class UserServiceImpl implements UserService{
         return response;
     }
 
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    public User getUserById(Long id) throws EntityNotFoundException {
+        Optional<User> user = userRepository.findById(id);
+        if(user.isEmpty()) {
+            throw new EntityNotFoundException(ErrorResponseMessages.userNotFound);
+        }
+
+        return user.get();
     }
 
     @Override
     public BookBorrowResponse saveBorrowBook(BookBorrowDto bookBorrowDto) throws EntityNotFoundException, CopiesNotAvailableException {
 
-        //id check
-        if(getUserById(bookBorrowDto.getId()).isEmpty()) {
-            throw new EntityNotFoundException(ErrorResponseMessages.userNotFound);
-        }
+        User user = getUserById(bookBorrowDto.getId());
         //book check
         if(bookService.fetchBookById(bookBorrowDto.getIsbnCode()).isEmpty()) {
             throw new EntityNotFoundException(ErrorResponseMessages.bookNotFound);
@@ -84,7 +85,6 @@ public class UserServiceImpl implements UserService{
 
         BookItem bookItem = copies.get(0);
         bookItemService.updateAvailable(bookItem.getBarcode(), false);
-        User user = getUserById(bookBorrowDto.getId()).get();
 
         BorrowDetailsMapper borrowDetailsMapper = new BorrowDetailsMapper();
         BorrowDetails borrowDetails = borrowDetailsMapper.fromBookBorrowDto(bookBorrowDto);
@@ -98,15 +98,31 @@ public class UserServiceImpl implements UserService{
     public LibraryCardResponse fetchLibraryCard(GetLibraryCardDto getLibraryCardDto) throws EntityNotFoundException {
 
         //user exists check
-        if(userRepository.findById(getLibraryCardDto.getId()).isEmpty()) {
-            throw new EntityNotFoundException(ErrorResponseMessages.userNotFound);
-        }
-        //user info collected
-        User user = userRepository.findById(getLibraryCardDto.getId()).get();
+        User user = getUserById(getLibraryCardDto.getId());
 
         List<BorrowDetails> borrowDetailsList = borrowService.fetchActiveBorrowsByUserId(getLibraryCardDto.getId());
         System.out.println(borrowDetailsList);
 
         return new LibraryCardResponse(user, borrowDetailsList);
+    }
+
+    @Override
+    @Transactional
+    public ReturnBookResponse returnBook(ReturnBookDto returnBookDto) throws EntityNotFoundException, InvalidEntityException {
+        BorrowDetails borrowDetails = borrowService.fetchByIssueId(returnBookDto.getIssueId());
+
+        //invalid library id check
+        if(!borrowDetails.getUser().getId().equals(returnBookDto.getLibraryId())) {
+            throw new InvalidEntityException(ErrorResponseMessages.invalidLibraryIdForReturn);
+        }
+        //invalid barcode check
+        if(!borrowDetails.getBookItem().getBarcode().equals(returnBookDto.getBarcode())) {
+            throw new InvalidEntityException(ErrorResponseMessages.invalidBarcodeForReturn);
+        }
+
+        borrowService.updateReturnDate(borrowDetails.getId());
+        bookItemService.updateAvailable(returnBookDto.getBarcode(), true);
+
+        return new ReturnBookResponse(borrowService.fetchByIssueId(borrowDetails.getId()));
     }
 }

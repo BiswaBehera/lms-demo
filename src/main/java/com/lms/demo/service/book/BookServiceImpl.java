@@ -34,12 +34,9 @@ public class BookServiceImpl implements BookService{
     @Override
     public AddBookResponse saveBook(AddBookDto addBookDto) throws NotAnAdminException, DuplicateEntityException, EntityNotFoundException {
         //user exist check
-        Optional<User> userOptional = userService.getUserById(addBookDto.getAdminId());
-        if(userOptional.isEmpty()) {
-            throw new EntityNotFoundException(ErrorResponseMessages.userNotFound);
-        }
+        User user = userService.getUserById(addBookDto.getAdminId());
         //admin check
-        if(!userOptional.get().getIsAdmin()) {
+        if(!user.getIsAdmin()) {
             throw new NotAnAdminException(ErrorResponseMessages.notAnAdminForAddBook);
         }
 

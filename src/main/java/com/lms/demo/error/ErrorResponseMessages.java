@@ -25,4 +25,11 @@ public class ErrorResponseMessages {
     public static String copiesNotAvailable = "All copies of the book are borrowed";
 
     public static String illegalIdValueForLibraryCard = "Library id is required";
+
+    public static String nullIssueIdForReturn = "Issue Id is required";
+    public static String nullLibraryIdForReturn = "Library Id is required";
+    public static String nullBarcodeForReturn = "Barcode is required";
+    public static String borrowDetailsNotFound = "No such borrow has been made";
+    public static String invalidLibraryIdForReturn = "Library id is wrong";
+    public static String invalidBarcodeForReturn = "Barcode is wrong";
 }
