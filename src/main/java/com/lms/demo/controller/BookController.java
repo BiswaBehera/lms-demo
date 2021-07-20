@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.lms.demo.dao.model.Book;
 import com.lms.demo.dto.book.AddBookDto;
 import com.lms.demo.dto.book.AddBookResponse;
+import com.lms.demo.dto.book.SearchType;
 import com.lms.demo.error.*;
 import com.lms.demo.service.book.BookService;
 import org.apache.tomcat.util.json.JSONParser;
@@ -39,5 +40,11 @@ public class BookController {
         }
 
         return bookService.saveBook(addBookDto);
+    }
+
+    @GetMapping("/book/{search_by}/{search_string}")
+    public List<Book> searchBooks(@PathVariable("search_by") SearchType searchType,
+                                  @PathVariable("search_string") String searchString) {
+        return bookService.searchBookRoot(searchType, searchString);
     }
 }

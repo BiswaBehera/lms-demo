@@ -7,6 +7,7 @@ import com.lms.demo.dao.model.User;
 import com.lms.demo.dao.repository.BookRepository;
 import com.lms.demo.dto.book.AddBookDto;
 import com.lms.demo.dto.book.AddBookResponse;
+import com.lms.demo.dto.book.SearchType;
 import com.lms.demo.dto.mapper.BookMapper;
 import com.lms.demo.error.DuplicateEntityException;
 import com.lms.demo.error.EntityNotFoundException;
@@ -16,6 +17,8 @@ import com.lms.demo.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -74,5 +77,31 @@ public class BookServiceImpl implements BookService{
     @Override
     public Optional<Book> fetchBookById(Long isbn) {
         return bookRepository.findById(isbn);
+    }
+
+    @Override
+    public List<Book> searchBookRoot(SearchType searchType, String searchString) {
+
+        switch (searchType) {
+            case AUTHOR: return searchBookByAuthor(searchString);
+            case TITLE: return searchBookByTitle(searchString);
+            case GENRE: return searchBookByGenre(searchString);
+            default: return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<Book> searchBookByTitle(String searchString) {
+        return bookRepository.findByTitleContaining(searchString);
+    }
+
+    @Override
+    public List<Book> searchBookByGenre(String searchString) {
+        return bookRepository.findByGenreContaining(searchString);
+    }
+
+    @Override
+    public List<Book> searchBookByAuthor(String searchString) {
+        return bookRepository.findByAuthorNameContaining(searchString);
     }
 }
