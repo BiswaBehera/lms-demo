@@ -5,6 +5,7 @@ import com.lms.demo.dao.repository.BookItemRepository;
 import com.lms.demo.dao.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,7 +28,8 @@ public class BookItemServiceImpl implements BookItemService{
     }
 
     @Override
-    public BookItem updateAvailable(Long barcode) {
-        return bookItemRepository.updateAvailable(barcode);
+    @Transactional
+    public int updateAvailable(Long barcode, Boolean available) {
+        return bookItemRepository.updateAvailable(barcode, available);
     }
 }

@@ -23,4 +23,6 @@ public class ErrorResponseMessages {
     public static String userNotFound = "User doesn't exist";
     public static String bookNotFound = "Book doesn't exist";
     public static String copiesNotAvailable = "All copies of the book are borrowed";
+
+    public static String illegalIdValueForLibraryCard = "Library id is required";
 }

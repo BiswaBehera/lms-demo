@@ -1,10 +1,6 @@
 package com.lms.demo.controller;
 
-import com.lms.demo.dao.model.User;
-import com.lms.demo.dto.user.AddUserDto;
-import com.lms.demo.dto.user.AddUserResponse;
-import com.lms.demo.dto.user.BookBorrowDto;
-import com.lms.demo.dto.user.BookBorrowResponse;
+import com.lms.demo.dto.user.*;
 import com.lms.demo.error.*;
 import com.lms.demo.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,5 +42,15 @@ public class UserController {
         }
 
         return userService.saveBorrowBook(bookBorrowDto);
+    }
+
+    @PostMapping("/user/get_library_card")
+    public LibraryCardResponse fetchLibraryCard(@RequestBody GetLibraryCardDto getLibraryCardDto) throws IllegalPropertyValueException, EntityNotFoundException {
+        //null check for library id
+        if(getLibraryCardDto.getId() == null) {
+            throw new IllegalPropertyValueException(ErrorResponseMessages.illegalIdValueForLibraryCard);
+        }
+
+        return userService.fetchLibraryCard(getLibraryCardDto);
     }
 }

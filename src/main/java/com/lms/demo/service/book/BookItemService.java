@@ -7,5 +7,5 @@ import java.util.List;
 public interface BookItemService {
     BookItem saveBookItem(BookItem bookItem);
     List<BookItem> fetchByIsbnAndAvailability(Long isbn, Boolean availability);
-    BookItem updateAvailable(Long barcode);
+    int updateAvailable(Long barcode, Boolean available);
 }

@@ -6,10 +6,7 @@ import com.lms.demo.dao.model.User;
 import com.lms.demo.dao.repository.UserRepository;
 import com.lms.demo.dto.mapper.BorrowDetailsMapper;
 import com.lms.demo.dto.mapper.UserMapper;
-import com.lms.demo.dto.user.AddUserDto;
-import com.lms.demo.dto.user.AddUserResponse;
-import com.lms.demo.dto.user.BookBorrowDto;
-import com.lms.demo.dto.user.BookBorrowResponse;
+import com.lms.demo.dto.user.*;
 import com.lms.demo.error.*;
 import com.lms.demo.service.book.BookItemService;
 import com.lms.demo.service.book.BookService;
@@ -86,7 +83,7 @@ public class UserServiceImpl implements UserService{
         }
 
         BookItem bookItem = copies.get(0);
-        bookItemService.updateAvailable(bookItem.getBarcode());
+        bookItemService.updateAvailable(bookItem.getBarcode(), false);
         User user = getUserById(bookBorrowDto.getId()).get();
 
         BorrowDetailsMapper borrowDetailsMapper = new BorrowDetailsMapper();
@@ -95,5 +92,21 @@ public class UserServiceImpl implements UserService{
         borrowDetails.setBookItem(bookItem);
 
         return new BookBorrowResponse(borrowService.saveBorrow(borrowDetails));
+    }
+
+    @Override
+    public LibraryCardResponse fetchLibraryCard(GetLibraryCardDto getLibraryCardDto) throws EntityNotFoundException {
+
+        //user exists check
+        if(userRepository.findById(getLibraryCardDto.getId()).isEmpty()) {
+            throw new EntityNotFoundException(ErrorResponseMessages.userNotFound);
+        }
+        //user info collected
+        User user = userRepository.findById(getLibraryCardDto.getId()).get();
+
+        List<BorrowDetails> borrowDetailsList = borrowService.fetchActiveBorrowsByUserId(getLibraryCardDto.getId());
+        System.out.println(borrowDetailsList);
+
+        return new LibraryCardResponse(user, borrowDetailsList);
     }
 }
