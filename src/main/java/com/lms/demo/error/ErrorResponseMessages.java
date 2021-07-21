@@ -32,4 +32,5 @@ public class ErrorResponseMessages {
     public static String borrowDetailsNotFound = "No such borrow has been made";
     public static String invalidLibraryIdForReturn = "Library id is wrong";
     public static String invalidBarcodeForReturn = "Barcode is wrong";
+    public static String bookAlreadyReturnedForReturn = "Book is Already Returned";
 }

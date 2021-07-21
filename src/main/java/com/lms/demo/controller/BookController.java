@@ -43,8 +43,8 @@ public class BookController {
     }
 
     @GetMapping("/book/{search_by}/{search_string}")
-    public List<Book> searchBooks(@PathVariable("search_by") SearchType searchType,
+    public List<Book> searchBook(@PathVariable("search_by") SearchType searchType,
                                   @PathVariable("search_string") String searchString) {
-        return bookService.searchBookRoot(searchType, searchString);
+        return bookService.searchBook(searchType, searchString);
     }
 }

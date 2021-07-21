@@ -53,4 +53,11 @@ public class RestEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
     }
+
+    @ExceptionHandler(BookAlreadyReturnedException.class)
+    public ResponseEntity<ErrorMessage> bookAlreadyReturnedExceptionHandler(BookAlreadyReturnedException e, WebRequest req) {
+        ErrorMessage message = new ErrorMessage(HttpStatus.CONFLICT, e.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+    }
 }

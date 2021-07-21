@@ -12,5 +12,5 @@ public interface UserService {
     User getUserById(Long id) throws EntityNotFoundException;
     BookBorrowResponse saveBorrowBook(BookBorrowDto bookBorrowDto) throws EntityNotFoundException, CopiesNotAvailableException;
     LibraryCardResponse fetchLibraryCard(GetLibraryCardDto getLibraryCardDto) throws EntityNotFoundException;
-    ReturnBookResponse returnBook(ReturnBookDto returnBookDto) throws EntityNotFoundException, InvalidEntityException;
+    ReturnBookResponse returnBook(ReturnBookDto returnBookDto) throws EntityNotFoundException, InvalidEntityException, BookAlreadyReturnedException;
 }

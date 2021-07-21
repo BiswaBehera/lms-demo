@@ -87,9 +87,7 @@ public class UserServiceImpl implements UserService{
         bookItemService.updateAvailable(bookItem.getBarcode(), false);
 
         BorrowDetailsMapper borrowDetailsMapper = new BorrowDetailsMapper();
-        BorrowDetails borrowDetails = borrowDetailsMapper.fromBookBorrowDto(bookBorrowDto);
-        borrowDetails.setUser(user);
-        borrowDetails.setBookItem(bookItem);
+        BorrowDetails borrowDetails = borrowDetailsMapper.fromBookBorrowDto(bookBorrowDto, user, bookItem);
 
         return new BookBorrowResponse(borrowService.saveBorrow(borrowDetails));
     }
@@ -100,15 +98,18 @@ public class UserServiceImpl implements UserService{
         //user exists check
         User user = getUserById(getLibraryCardDto.getId());
 
+        // refresh fines
+        borrowService.updateFine();
+
+        //get active borrows for a user
         List<BorrowDetails> borrowDetailsList = borrowService.fetchActiveBorrowsByUserId(getLibraryCardDto.getId());
-        System.out.println(borrowDetailsList);
 
         return new LibraryCardResponse(user, borrowDetailsList);
     }
 
     @Override
     @Transactional
-    public ReturnBookResponse returnBook(ReturnBookDto returnBookDto) throws EntityNotFoundException, InvalidEntityException {
+    public ReturnBookResponse returnBook(ReturnBookDto returnBookDto) throws EntityNotFoundException, InvalidEntityException, BookAlreadyReturnedException {
         BorrowDetails borrowDetails = borrowService.fetchByIssueId(returnBookDto.getIssueId());
 
         //invalid library id check
@@ -120,7 +121,13 @@ public class UserServiceImpl implements UserService{
             throw new InvalidEntityException(ErrorResponseMessages.invalidBarcodeForReturn);
         }
 
+        //check if book is already returned
+        if(borrowDetails.getReturnDate() != null) {
+            throw new BookAlreadyReturnedException(ErrorResponseMessages.bookAlreadyReturnedForReturn);
+        }
+
         borrowService.updateReturnDate(borrowDetails.getId());
+        borrowService.updateFine(borrowDetails);
         bookItemService.updateAvailable(returnBookDto.getBarcode(), true);
 
         return new ReturnBookResponse(borrowService.fetchByIssueId(borrowDetails.getId()));

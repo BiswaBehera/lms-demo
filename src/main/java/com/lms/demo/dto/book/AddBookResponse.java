@@ -6,6 +6,10 @@ import lombok.Data;
 
 @Data
 public class AddBookResponse {
+
+    @JsonProperty("isbn_code")
+    private Long isbnCode;
+
     @JsonProperty("title")
     private String title;
 
@@ -19,6 +23,7 @@ public class AddBookResponse {
     private String message;
 
     public AddBookResponse(Book book) {
+        this.setIsbnCode(book.getIsbnCode());
         this.setTitle(book.getTitle());
         this.setAuthorName(book.getAuthor().getName());
         this.setGenre(book.getGenre());

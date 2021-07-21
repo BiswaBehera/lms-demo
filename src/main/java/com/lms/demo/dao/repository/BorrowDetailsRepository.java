@@ -2,6 +2,7 @@ package com.lms.demo.dao.repository;
 
 import com.lms.demo.dao.model.BorrowDetails;
 import com.lms.demo.dao.model.User;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,12 @@ public interface BorrowDetailsRepository extends JpaRepository<BorrowDetails, Lo
 
 
     List<BorrowDetails> findByUserAndReturnDate(User user, Date returnDate);
+
+    List<BorrowDetails> findByReturnDateAndDueDate(Date returnDate, Date dueDate);
+
+    @Modifying
+    @Query("UPDATE BorrowDetails bd SET bd.fine = :fine WHERE bd.id = :issueId")
+    void updateFineByIssueId(@Param("issueId") Long issueId, @Param("fine") Integer fine);
 
     @Modifying
     @Query("UPDATE BorrowDetails bd SET bd.returnDate = :returnDate WHERE bd.id = :issueId")

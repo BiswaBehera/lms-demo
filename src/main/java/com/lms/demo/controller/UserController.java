@@ -45,7 +45,7 @@ public class UserController {
     }
 
     @PostMapping("/user/return")
-    public ReturnBookResponse returnBook(@RequestBody ReturnBookDto returnBookDto) throws IllegalPropertyValueException, EntityNotFoundException, InvalidEntityException {
+    public ReturnBookResponse returnBook(@RequestBody ReturnBookDto returnBookDto) throws IllegalPropertyValueException, EntityNotFoundException, InvalidEntityException, BookAlreadyReturnedException {
 
         //null issue id check
         if(returnBookDto.getIssueId() == null) {

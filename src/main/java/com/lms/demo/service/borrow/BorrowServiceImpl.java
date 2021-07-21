@@ -8,6 +8,7 @@ import com.lms.demo.error.ErrorResponseMessages;
 import com.lms.demo.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.util.List;
@@ -38,13 +39,32 @@ public class BorrowServiceImpl implements BorrowService{
     }
 
     @Override
-    public BorrowDetails updateFineWithoutPersist(BorrowDetails borrowDetails) {
-        Date dueDate = borrowDetails.getDueDate();
-        if(System.currentTimeMillis() > dueDate.getTime()) {
-            long day_diff = ((System.currentTimeMillis() - dueDate.getTime()) / (1000*60*60*24)) % 365;
-            borrowDetails.setFine((int) day_diff * 10);
+    @Transactional
+    public void updateFine() {
+        List<BorrowDetails> list = borrowDetailsRepository.findByReturnDateAndDueDate(null, new Date(System.currentTimeMillis()));
+
+        for(BorrowDetails bd : list) {
+            Date dueDate = bd.getDueDate();
+            Date currentDate = new Date(System.currentTimeMillis());
+            if(currentDate.getTime() > dueDate.getTime()) {
+                long day_diff = ((currentDate.getTime()- dueDate.getTime()) / (1000 * 60 * 60 * 24));
+                int fine = (int) day_diff * 10;
+
+                borrowDetailsRepository.updateFineByIssueId(bd.getId(), fine);
+            }
         }
-        return borrowDetails;
+    }
+    @Override
+    @Transactional
+    public void updateFine(BorrowDetails borrowDetails) {
+        Date dueDate = borrowDetails.getDueDate();
+        Date currentDate = new Date(System.currentTimeMillis());
+        if(currentDate.getTime() > dueDate.getTime()) {
+            long day_diff = ((currentDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+            int fine = (int) day_diff * 10;
+
+            borrowDetailsRepository.updateFineByIssueId(borrowDetails.getId(), fine);
+        }
     }
 
     @Override
@@ -52,14 +72,7 @@ public class BorrowServiceImpl implements BorrowService{
 
         User user = userService.getUserById(id);
 
-        List<BorrowDetails> activeBorrowDetailsList =
-                borrowDetailsRepository.findByUserAndReturnDate(user, null);
-
-        for(BorrowDetails b: activeBorrowDetailsList) {
-            updateFineWithoutPersist(b);
-        }
-
-        return activeBorrowDetailsList;
+        return borrowDetailsRepository.findByUserAndReturnDate(user, null);
     }
 
     @Override

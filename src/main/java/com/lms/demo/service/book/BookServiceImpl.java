@@ -80,7 +80,7 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public List<Book> searchBookRoot(SearchType searchType, String searchString) {
+    public List<Book> searchBook(SearchType searchType, String searchString) {
 
         switch (searchType) {
             case AUTHOR: return searchBookByAuthor(searchString);

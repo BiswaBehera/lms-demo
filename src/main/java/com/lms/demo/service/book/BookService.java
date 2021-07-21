@@ -15,7 +15,7 @@ public interface BookService {
     AddBookResponse saveBook(AddBookDto addBookDto) throws NotAnAdminException, DuplicateEntityException, EntityNotFoundException;
     Optional<Book> fetchBookById(Long isbn);
 
-    List<Book> searchBookRoot(SearchType searchType, String searchString);
+    List<Book> searchBook(SearchType searchType, String searchString);
     List<Book> searchBookByTitle(String searchString);
     List<Book> searchBookByGenre(String searchString);
     List<Book> searchBookByAuthor(String searchString);
