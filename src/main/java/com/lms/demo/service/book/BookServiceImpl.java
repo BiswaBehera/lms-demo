@@ -14,14 +14,16 @@ import com.lms.demo.error.EntityNotFoundException;
 import com.lms.demo.error.ErrorResponseMessages;
 import com.lms.demo.error.NotAnAdminException;
 import com.lms.demo.service.user.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
-
+@Slf4j
 @Service
 public class BookServiceImpl implements BookService{
 
@@ -36,40 +38,33 @@ public class BookServiceImpl implements BookService{
 
     @Override
     public AddBookResponse saveBook(AddBookDto addBookDto) throws NotAnAdminException, DuplicateEntityException, EntityNotFoundException {
+
         //user exist check
         User user = userService.getUserById(addBookDto.getAdminId());
+        log.info("User found");
+
         //admin check
         if(!user.getIsAdmin()) {
+            log.warn("User is not an Admin");
             throw new NotAnAdminException(ErrorResponseMessages.notAnAdminForAddBook);
         }
+        log.info("User is an Admin");
 
         //create author if not there
-        String authorName = addBookDto.getAuthorName();
-        Author author = new Author();
-        if(authorService.getAuthorByName(authorName) != null) {
-            author = authorService.getAuthorByName(authorName);
-        } else {
-            author.setName(authorName);
-            author = authorService.saveAuthor(author);
-        }
+        Author author = authorService.saveAuthor(addBookDto.getAuthorName());
 
         //duplicate book check
         if(bookRepository.findByTitleAndAuthor(addBookDto.getTitle(), author).size() != 0) {
+            log.warn("Book Already exists");
             throw new DuplicateEntityException(ErrorResponseMessages.duplicateBooK);
         }
 
+        //map book from addBookDto and save it
         BookMapper bookMapper = new BookMapper();
-        Book book = bookMapper.fromAddBook(addBookDto);
-        book.setAuthor(author);
+        Book book = bookRepository.save(bookMapper.fromAddBook(addBookDto, author));
 
-        book = bookRepository.save(book);
-
-        for(int i = 0; i < addBookDto.getNumberOfCopies(); i++) {
-            BookItem bookItem = new BookItem();
-            bookItem.setAvailable(true);
-            bookItem.setBook(book);
-            bookItemService.saveBookItem(bookItem);
-        }
+        //add copies to the library
+        bookItemService.saveBookItems(book, addBookDto.getNumberOfCopies());
 
         return new AddBookResponse(book);
     }
@@ -86,8 +81,14 @@ public class BookServiceImpl implements BookService{
             case AUTHOR: return searchBookByAuthor(searchString);
             case TITLE: return searchBookByTitle(searchString);
             case GENRE: return searchBookByGenre(searchString);
+            case ALL: return fetchAllBooks();
             default: return new ArrayList<>();
         }
+    }
+
+    @Override
+    public  List<Book> fetchAllBooks() {
+        return  bookRepository.findAll();
     }
 
     @Override

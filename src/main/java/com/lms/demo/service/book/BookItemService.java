@@ -1,11 +1,12 @@
 package com.lms.demo.service.book;
 
+import com.lms.demo.dao.model.Book;
 import com.lms.demo.dao.model.BookItem;
 
 import java.util.List;
 
 public interface BookItemService {
-    BookItem saveBookItem(BookItem bookItem);
+    void saveBookItems(Book book, Integer numberOfCopies);
     List<BookItem> fetchByIsbnAndAvailability(Long isbn, Boolean availability);
-    int updateAvailable(Long barcode, Boolean available);
+    void updateAvailable(Long barcode, Boolean available);
 }

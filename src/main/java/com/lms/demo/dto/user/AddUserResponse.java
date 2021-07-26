@@ -3,10 +3,12 @@ package com.lms.demo.dto.user;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lms.demo.dao.model.User;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class AddUserResponse {
-    @JsonProperty("id")
+    @JsonProperty("library_id")
     private Long id;
 
     @JsonProperty("name")

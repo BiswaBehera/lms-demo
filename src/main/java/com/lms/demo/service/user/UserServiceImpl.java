@@ -11,6 +11,7 @@ import com.lms.demo.error.*;
 import com.lms.demo.service.book.BookItemService;
 import com.lms.demo.service.book.BookService;
 import com.lms.demo.service.borrow.BorrowService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService{
 
@@ -61,7 +63,11 @@ public class UserServiceImpl implements UserService{
 
     public User getUserById(Long id) throws EntityNotFoundException {
         Optional<User> user = userRepository.findById(id);
+
+        log.info("User found by id: {}", user);
+
         if(user.isEmpty()) {
+            log.warn("User not found!!!");
             throw new EntityNotFoundException(ErrorResponseMessages.userNotFound);
         }
 
@@ -112,6 +118,11 @@ public class UserServiceImpl implements UserService{
     public ReturnBookResponse returnBook(ReturnBookDto returnBookDto) throws EntityNotFoundException, InvalidEntityException, BookAlreadyReturnedException {
         BorrowDetails borrowDetails = borrowService.fetchByIssueId(returnBookDto.getIssueId());
 
+        //user doesn't exist
+        if(!userRepository.existsById(returnBookDto.getLibraryId())) {
+            throw new EntityNotFoundException(ErrorResponseMessages.userNotFound);
+        }
+
         //invalid library id check
         if(!borrowDetails.getUser().getId().equals(returnBookDto.getLibraryId())) {
             throw new InvalidEntityException(ErrorResponseMessages.invalidLibraryIdForReturn);
@@ -126,7 +137,7 @@ public class UserServiceImpl implements UserService{
             throw new BookAlreadyReturnedException(ErrorResponseMessages.bookAlreadyReturnedForReturn);
         }
 
-        borrowService.updateReturnDate(borrowDetails.getId());
+        borrowService.updateReturnDate(borrowDetails);
         borrowService.updateFine(borrowDetails);
         bookItemService.updateAvailable(returnBookDto.getBarcode(), true);
 

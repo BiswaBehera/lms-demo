@@ -1,5 +1,5 @@
 package com.lms.demo.dto.book;
 
 public enum SearchType {
-    AUTHOR, GENRE, TITLE
+    AUTHOR, GENRE, TITLE, ALL
 }

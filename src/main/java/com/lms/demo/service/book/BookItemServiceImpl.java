@@ -1,14 +1,18 @@
 package com.lms.demo.service.book;
 
+import com.lms.demo.dao.model.Book;
 import com.lms.demo.dao.model.BookItem;
 import com.lms.demo.dao.repository.BookItemRepository;
 import com.lms.demo.dao.repository.BookRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
+@Slf4j
 @Service
 public class BookItemServiceImpl implements BookItemService{
 
@@ -18,8 +22,23 @@ public class BookItemServiceImpl implements BookItemService{
     private BookRepository bookRepository;
 
     @Override
-    public BookItem saveBookItem(BookItem bookItem) {
-        return bookItemRepository.save(bookItem);
+    public void saveBookItems(Book book, Integer numberOfCopies) {
+        //number of copies to be added to the library
+        log.info("creating book items for new Book");
+        if(Objects.isNull(numberOfCopies)) {
+            log.info("Default Number of Copies assigned");
+            numberOfCopies = 5;
+        }
+
+        for(int i = 0; i < numberOfCopies; i++) {
+
+            log.info("creating copy-{}", i+1);
+            BookItem bookItem = new BookItem();
+            bookItem.setBook(book);
+            bookItem.setAvailable(true);
+
+            bookItemRepository.save(bookItem);
+        }
     }
 
     @Override
@@ -29,7 +48,8 @@ public class BookItemServiceImpl implements BookItemService{
 
     @Override
     @Transactional
-    public int updateAvailable(Long barcode, Boolean available) {
-        return bookItemRepository.updateAvailable(barcode, available);
+    public void updateAvailable(Long barcode, Boolean available) {
+        BookItem bookItem = bookItemRepository.getById(barcode);
+        bookItem.setAvailable(available);
     }
 }

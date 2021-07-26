@@ -50,7 +50,7 @@ public class BorrowServiceImpl implements BorrowService{
                 long day_diff = ((currentDate.getTime()- dueDate.getTime()) / (1000 * 60 * 60 * 24));
                 int fine = (int) day_diff * 10;
 
-                borrowDetailsRepository.updateFineByIssueId(bd.getId(), fine);
+                bd.setFine(fine);
             }
         }
     }
@@ -63,7 +63,7 @@ public class BorrowServiceImpl implements BorrowService{
             long day_diff = ((currentDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
             int fine = (int) day_diff * 10;
 
-            borrowDetailsRepository.updateFineByIssueId(borrowDetails.getId(), fine);
+            borrowDetails.setFine(fine);
         }
     }
 
@@ -75,8 +75,12 @@ public class BorrowServiceImpl implements BorrowService{
         return borrowDetailsRepository.findByUserAndReturnDate(user, null);
     }
 
-    @Override
-    public int updateReturnDate(Long issueId) {
-        return borrowDetailsRepository.updateReturnDateByIssueId(issueId, new Date(System.currentTimeMillis()));
+//    @Override
+//    public int updateReturnDate(Long issueId) {
+//        return borrowDetailsRepository.updateReturnDateByIssueId(issueId, new Date(System.currentTimeMillis()));
+//    }
+
+    public void updateReturnDate(BorrowDetails borrowDetails) {
+        borrowDetails.setReturnDate(new Date(System.currentTimeMillis()));
     }
 }

@@ -1,12 +1,14 @@
 package com.lms.demo.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.lms.demo.dao.model.BookItem;
 import com.lms.demo.dao.model.BorrowDetails;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.sql.Date;
 
 @Data
+@NoArgsConstructor
 public class BookBorrowResponse {
 
     @JsonProperty("barcode")

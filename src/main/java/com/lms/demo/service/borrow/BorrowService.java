@@ -12,5 +12,6 @@ public interface BorrowService {
     void updateFine(BorrowDetails borrowDetails);
     List<BorrowDetails> fetchActiveBorrowsByUserId(Long id) throws EntityNotFoundException;
 
-    int updateReturnDate(Long issueId);
+//    int updateReturnDate(Long issueId);
+    void updateReturnDate(BorrowDetails borrowDetails);
 }
