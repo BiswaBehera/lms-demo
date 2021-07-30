@@ -53,4 +53,7 @@ public class BorrowDetails {
             nullable = false
     )
     private BookItem bookItem;
+
+    @Version
+    private Integer version;
 }

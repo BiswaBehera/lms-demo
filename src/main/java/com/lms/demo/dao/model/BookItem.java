@@ -23,4 +23,7 @@ public class BookItem {
             referencedColumnName = "isbn_code"
     )
     private Book book;
+
+    @Version
+    private Integer version;
 }

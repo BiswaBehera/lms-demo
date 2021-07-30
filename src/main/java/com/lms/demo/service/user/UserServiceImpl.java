@@ -66,12 +66,12 @@ public class UserServiceImpl implements UserService{
 
         log.info("User found by id: {}", user);
 
-        if(user.isEmpty()) {
+        if(user.isPresent()) {
+            return user.get();
+        } else {
             log.warn("User not found!!!");
             throw new EntityNotFoundException(ErrorResponseMessages.userNotFound);
         }
-
-        return user.get();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService{
 
         User user = getUserById(bookBorrowDto.getId());
         //book check
-        if(bookService.fetchBookById(bookBorrowDto.getIsbnCode()).isEmpty()) {
+        if(!bookService.fetchBookById(bookBorrowDto.getIsbnCode()).isPresent()) {
             throw new EntityNotFoundException(ErrorResponseMessages.bookNotFound);
         }
 
@@ -114,8 +114,10 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    @Transactional
-    public ReturnBookResponse returnBook(ReturnBookDto returnBookDto) throws EntityNotFoundException, InvalidEntityException, BookAlreadyReturnedException {
+    public ReturnBookResponse returnBook(
+            final ReturnBookDto returnBookDto
+    ) throws EntityNotFoundException, InvalidEntityException, BookAlreadyReturnedException {
+
         BorrowDetails borrowDetails = borrowService.fetchByIssueId(returnBookDto.getIssueId());
 
         //user doesn't exist
@@ -137,10 +139,17 @@ public class UserServiceImpl implements UserService{
             throw new BookAlreadyReturnedException(ErrorResponseMessages.bookAlreadyReturnedForReturn);
         }
 
+        returnBookTransaction(borrowDetails, returnBookDto);
+
+        return new ReturnBookResponse(borrowService.fetchByIssueId(borrowDetails.getId()));
+    }
+
+    @Transactional
+    public void returnBookTransaction(
+            BorrowDetails borrowDetails,
+            ReturnBookDto returnBookDto) {
         borrowService.updateReturnDate(borrowDetails);
         borrowService.updateFine(borrowDetails);
         bookItemService.updateAvailable(returnBookDto.getBarcode(), true);
-
-        return new ReturnBookResponse(borrowService.fetchByIssueId(borrowDetails.getId()));
     }
 }

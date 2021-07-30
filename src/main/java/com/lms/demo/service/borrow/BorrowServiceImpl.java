@@ -31,11 +31,11 @@ public class BorrowServiceImpl implements BorrowService{
     @Override
     public BorrowDetails fetchByIssueId(Long id) throws EntityNotFoundException {
         Optional<BorrowDetails> borrowDetails = borrowDetailsRepository.findById(id);
-        if(borrowDetails.isEmpty()) {
+        if(borrowDetails.isPresent()) {
+            return borrowDetails.get();
+        } else {
             throw new EntityNotFoundException(ErrorResponseMessages.borrowDetailsNotFound);
         }
-
-        return borrowDetails.get();
     }
 
     @Override
