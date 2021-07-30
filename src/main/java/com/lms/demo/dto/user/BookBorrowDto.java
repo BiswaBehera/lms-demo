@@ -5,26 +5,17 @@ import com.lms.demo.error.ErrorResponseMessages;
 import com.lms.demo.error.IllegalPropertyValueException;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Data
 public class BookBorrowDto {
 
     @JsonProperty("library_id")
+    @NotNull(message = "Library Id is required")
     private Long id;
 
     @JsonProperty("isbn_code")
+    @NotNull(message = "ISBN code is required")
     private Long isbnCode;
-
-    public void nullCheckForRequiredProperties() throws IllegalPropertyValueException {
-        // null check for library id
-        if(Objects.isNull(this.getId())) {
-            throw new IllegalPropertyValueException(ErrorResponseMessages.nullIdValueForBorrow);
-        }
-
-        //null check for isbn code
-        if(Objects.isNull(this.getIsbnCode())) {
-            throw new IllegalPropertyValueException(ErrorResponseMessages.nullIsbnValueForBorrow);
-        }
-    }
 }

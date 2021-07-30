@@ -1,34 +1,28 @@
 package com.lms.demo.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.lms.demo.error.ErrorResponseMessages;
-import com.lms.demo.error.IllegalPropertyValueException;
 import lombok.Data;
 
-import java.util.Objects;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Data
 public class AddUserDto {
     @JsonProperty("name")
+    @NotNull(message = "Name is required")
+    @NotBlank(message = "Name is required")
     private String name;
 
     @JsonProperty("password")
     private String password;
 
     @JsonProperty("contact_number")
+    @NotNull(message = "Contact Number is required")
+    @NotBlank(message = "Contact Number is required")
+    @Size(min = 10, max = 10, message = "Contact number must have 10 digits")
     private String contactNumber;
 
     @JsonProperty("is_admin")
     private Boolean isAdmin;
-
-    public void nullCheckForRequiredProperties() throws IllegalPropertyValueException {
-        //null check for name
-        if(Objects.isNull(this.getName())) {
-            throw new IllegalPropertyValueException(ErrorResponseMessages.nullNameValueForUser);
-        }
-        //null check for contact number
-        if(Objects.isNull(this.getContactNumber())) {
-            throw new IllegalPropertyValueException(ErrorResponseMessages.nullContactValueForUser);
-        }
-    }
 }

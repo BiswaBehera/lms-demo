@@ -1,20 +1,22 @@
 package com.lms.demo.dto.book;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.lms.demo.error.ErrorResponseMessages;
-import com.lms.demo.error.IllegalPropertyValueException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Objects;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Slf4j
 @Data
 public class AddBookDto {
+
     @JsonProperty("admin_id")
+    @NotNull(message = "Admin ID is required")
     private Long adminId;
 
     @JsonProperty("title")
+    @NotNull(message = "Title of the book is Required")
+    @NotBlank(message = "Title of the book is Required")
     private String title;
 
     @JsonProperty("genre")
@@ -24,25 +26,7 @@ public class AddBookDto {
     private Integer numberOfCopies;
 
     @JsonProperty("author_name")
+    @NotNull(message = "Author name is required")
+    @NotBlank(message = "Author name is required")
     private String authorName;
-
-    public void nullCheckForRequiredProperties() throws IllegalPropertyValueException {
-        if(Objects.isNull(this.getTitle())) {
-            log.warn("Title value is null");
-
-            throw new IllegalPropertyValueException(ErrorResponseMessages.nullTitleValueForBook);
-        }
-
-        if(Objects.isNull(this.getAdminId())) {
-            log.warn("Admin ID value is null");
-
-            throw new IllegalPropertyValueException(ErrorResponseMessages.nullAdminValueForBook);
-        }
-
-        if(Objects.isNull(this.getAuthorName())) {
-            log.warn("Author Name value is null");
-
-            throw new IllegalPropertyValueException(ErrorResponseMessages.nullAuthorValueForBook);
-        }
-    }
 }

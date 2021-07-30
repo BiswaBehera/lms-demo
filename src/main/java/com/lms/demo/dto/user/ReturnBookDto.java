@@ -5,32 +5,21 @@ import com.lms.demo.error.ErrorResponseMessages;
 import com.lms.demo.error.IllegalPropertyValueException;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Data
 public class ReturnBookDto {
 
     @JsonProperty("issue_id")
+    @NotNull(message = "Issue ID cannot be null")
     private Long issueId;
 
     @JsonProperty("library_id")
+    @NotNull(message = "Library ID cannot be null")
     private Long libraryId;
 
     @JsonProperty("barcode")
+    @NotNull(message = "Barcode cannot be null")
     private Long barcode;
-
-    public void nullCheckForRequiredProperties() throws IllegalPropertyValueException {
-        //null issue id check
-        if(Objects.isNull(this.getIssueId())) {
-            throw new IllegalPropertyValueException(ErrorResponseMessages.nullIssueIdForReturn);
-        }
-        //null library id check
-        if(Objects.isNull(this.getLibraryId())) {
-            throw new IllegalPropertyValueException(ErrorResponseMessages.nullLibraryIdForReturn);
-        }
-        //null barcode check
-        if(Objects.isNull(this.getBarcode())) {
-            throw new IllegalPropertyValueException(ErrorResponseMessages.nullBarcodeForReturn);
-        }
-    }
 }
