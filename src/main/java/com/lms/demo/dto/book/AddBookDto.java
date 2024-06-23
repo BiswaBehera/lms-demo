@@ -3,8 +3,8 @@ package com.lms.demo.dto.book;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Slf4j
 @Data

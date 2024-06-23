@@ -5,7 +5,7 @@ import com.lms.demo.error.ErrorResponseMessages;
 import com.lms.demo.error.IllegalPropertyValueException;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Data
